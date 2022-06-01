@@ -1,7 +1,7 @@
 import { router, youngService } from "@youngjs/core";
-// import { ApiCategory } from "@youngjs/swagger-doc";
+import { ApiCategory } from "@youngjs/swagger-doc";
 @router("/admin/menu", ["info", "list", "add", "update", "delete"])
-// @ApiCategory("菜单管理")
+@ApiCategory("菜单管理")
 export default class AdminMenu extends youngService {
   constructor(ctx) {
     super(ctx);

@@ -1,13 +1,14 @@
 import { router, post, youngService } from "@youngjs/core";
 import { In } from "typeorm";
 import * as _ from "lodash";
-// import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
+import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
 import AdminUserEntity from "../../entity/admin/user";
-@router("/admin/user", ["info", "add", "update", "delete", "page"])
-// @ApiCategory("用户管理")
+
 /**
  * 后台用户
  */
+@router("/admin/user", ["info", "add", "update", "delete", "page"])
+@ApiCategory("用户管理")
 export default class AdminUser extends youngService {
   constructor(ctx) {
     super(ctx);
@@ -54,7 +55,7 @@ export default class AdminUser extends youngService {
    * 用户详情
    * @returns
    */
-  // @ApiDoc("用户信息", {}, { data: { description: "用户信息", type: "object" } })
+  @ApiDoc("用户信息", {}, { data: "用户信息" })
   async info() {
     const userId = this.ctx.adminUser.id;
     const user: any = await this.app.orm.AdminUserEntity.findOne({
