@@ -13,6 +13,7 @@ export default class Task extends youngService {
     //做一个判断
     if (!this.app.config.typeorm) {
       this.app.log.warn("config typeorm undefined,task Uninitialized!");
+      return;
     }
     const tasks: any = await this.app.orm.AdminTaskEntity.find({ status: 1 });
     const old = await this.app.task.getRepeatableJobs();

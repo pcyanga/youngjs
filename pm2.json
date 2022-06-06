@@ -1,9 +1,27 @@
 {
   "apps": [
     {
-      "name": "young",
+      "name": "youngjs",
       "watch": false,
-      "interpreter_args": "-P ../ -r tsconfig-paths/register",
+      "script": "./dist/app.js",
+      "exec_mode": "cluster",
+      "instances": 1,
+      "max_memory_restart": "1G",
+      "autorestart": true,
+      "autoput": "/dev/null",
+      "merge_logs": true,
+      "log_date_format": "YYYY-MM-DD HH:mm:ss",
+      "error": "./logs/err.log",
+      "output": "./logs/out.log",
+      "source_map_support": false,
+      "node_args": [],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    {
+      "name": "youngjs",
+      "watch": false,
       "script": "./dist/app.js",
       "exec_mode": "cluster",
       "instances": 1,
