@@ -12,15 +12,15 @@
     "dev": "nodemon app.ts"
   },
   "dependencies": {
-    "@youngjs/core": "^1.0.6",
+    "@youngjs/core": "^1.0.8",
     "@youngjs/swagger-doc": "^1.0.3",
     "jsonwebtoken": "^8.5.1",
     "svg-captcha": "^1.4.0",
-    "uuid": "^8.3.2",
-    "ts-node": "^10.5.0"
+    "ts-node": "^10.5.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "typescript": "^4.7.2",
-    "ts-node": "^10.5.0"
+    "ts-node": "^10.5.0",
+    "typescript": "^4.7.2"
   }
 }
