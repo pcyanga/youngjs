@@ -28,7 +28,7 @@ export default class Task extends youngService {
         removeOnComplete: true,
         removeOnFail: true,
       });
-      this.app.log.info(`task [${t.name}] init successfully!`);
+      this.app.log.info(`task [${t.name}] init successfully!`, true);
     });
   }
   getRepeatConfig(task) {
@@ -46,15 +46,17 @@ export default class Task extends youngService {
   //任务执行
   async execute(job, done) {
     this.executeForAsync(job);
-    const jobs = await this.app.task.getRepeatableJobs();
-    jobs.forEach((j) => {
-      if (j.id == job.data.id) {
-        this.app.orm.AdminTaskEntity.update(
-          { id: job.data.id },
-          { nextRunTime: moment(j.next).format("YYYY-MM-DD HH:mm:ss") }
-        );
-      }
-    });
+    if (this.app.config.typeorm) {
+      const jobs = await this.app.task.getRepeatableJobs();
+      jobs.forEach((j) => {
+        if (j.id == job.data.id) {
+          this.app.orm.AdminTaskEntity.update(
+            { id: job.data.id },
+            { nextRunTime: moment(j.next).format("YYYY-MM-DD HH:mm:ss") }
+          );
+        }
+      });
+    }
     done();
   }
   //异步执行
@@ -65,6 +67,7 @@ export default class Task extends youngService {
         const method = tmp[1].split("(")[0];
         const paramString = tmp[1].split("(")[1].split(")")[0];
         const params = paramString ? JSON.parse(paramString) : "";
+        console.log(tmp);
         const result = await this.app.service[tmp[0]][method](params);
         this.app.orm.AdminTaskLogEntity.save({
           taskId: job.data.id,

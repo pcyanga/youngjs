@@ -3,21 +3,21 @@ module.exports = {
   // typeorm 配置
   typeorm: {
     type: "mysql",
-    host: "localhost",
+    host: "47.106.113.98",
     port: 3306,
-    username: "root",
-    password: "pcyang",
+    username: "young",
+    password: "FwKHrkejdxyrCrn6",
     database: "young",
     synchronize: true,
     logging: false,
     charset: "utf8mb4",
   },
   // redis 配置
-  // redis: {
-  //   host: "127.0.0.1",
-  //   port: 6379,
-  //   db: 0,
-  // },
+  redis: {
+    host: "127.0.0.1",
+    port: 6379,
+    db: 0,
+  },
   // elasticsearch 配置
   // es: {
   //   host: "localhost:9200",
