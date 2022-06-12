@@ -1,12 +1,13 @@
 import { router, youngService } from "@youngjs/core";
 import * as moment from "moment";
 import { ApiCategory } from "@youngjs/swagger-doc";
+import AdminTaskEntity from "../../entity/admin/task";
 @ApiCategory("任务管理")
 @router("/admin/task", ["info", "page", "list", "add", "update", "delete"])
 export default class Task extends youngService {
   constructor(ctx) {
     super(ctx);
-    this.entity = "AdminTask";
+    this.entity = AdminTaskEntity;
   }
   //任务初始化
   async init() {

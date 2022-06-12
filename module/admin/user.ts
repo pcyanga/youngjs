@@ -1,4 +1,4 @@
-import { router, post, youngService } from "@youngjs/core";
+import { router, post, youngService, get } from "@youngjs/core";
 import { In } from "typeorm";
 import * as _ from "lodash";
 import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
@@ -17,23 +17,16 @@ export default class AdminUser extends youngService {
     this.searchOption.fieldEq = ["id"];
   }
   @post("/login")
-  // @ApiDoc(
-  //   "登录",
-  //   {
-  //     username: { description: "用户名" },
-  //     password: { description: "密码" },
-  //   },
-  //   {
-  //     data: {
-  //       type: "object",
-  //       description: "响应参数",
-  //       items: {
-  //         token: { description: "token", type: "string" },
-  //         exprireIn: { description: "有效时长", type: "integer" },
-  //       },
-  //     },
-  //   }
-  // )
+  @ApiDoc(
+    "登录",
+    { username: "用户名", password: "密码", },
+    {
+      data: {
+        token: "token",
+        exprireIn: "有效时长",
+      },
+    }
+  )
   async login() {
     const user = await this.app.orm.AdminUserEntity.findOne({
       username: this.body.username,
@@ -45,6 +38,8 @@ export default class AdminUser extends youngService {
     );
     //验证密码
     if (pwd != this.body.password) throw new Error("账号或者密码错误");
+    //判断状态
+    if (!user.status) throw new Error("用户被禁止登陆");
     const token = await this.ctx.makeUserToken({
       id: user.id,
       nickname: user.nickname,
@@ -57,7 +52,7 @@ export default class AdminUser extends youngService {
    */
   @ApiDoc("用户信息", {}, { data: "用户信息" })
   async info() {
-    const userId = this.ctx.adminUser.id;
+    const userId = this.query.id;
     const user: any = await this.app.orm.AdminUserEntity.findOne({
       id: userId,
     });
@@ -68,7 +63,6 @@ export default class AdminUser extends youngService {
     ).map((r) => {
       return r.roleId;
     });
-    await this.getUserMenu(user);
     return this.success(user);
   }
   /**
@@ -77,15 +71,12 @@ export default class AdminUser extends youngService {
    * @returns
    */
   async getUserMenu(user) {
-    // const exist = await this.app.redis.get(`adminMenu:${user.id}`);
-    // if (exist) {
-    //   user.menu = JSON.parse(exist);
-    //   return user;
-    // }
     const menu = await this.sql(
       `select a.id,a.name,a.pid,a.type,a.key,a.icon from admin_menu a
-    left join admin_role_menu b on a.id = b.menuId 
-    where b.roleId in (?) order by sort desc`,
+      left join admin_role_menu b on a.id = b.menuId 
+      where b.roleId in (?) 
+      group by a.id
+      order by sort desc`,
       [user.roleIds]
     );
     user.menu = this.app.service.AdminMenu.arrange(_.cloneDeep(menu));
@@ -107,8 +98,8 @@ export default class AdminUser extends youngService {
     if (exists) throw new Error("用户名已存在");
     await this.app.orm.AdminUserEntity.insert(this.body);
     //操作角色
-    if (this.body.roleIds) {
-      this.body.roleIds.split(",").forEach((roleId) => {
+    if (this.body.roleIds && this.body.roleIds.length) {
+      this.body.roleIds.forEach((roleId) => {
         this.app.orm.AdminUserRoleEntity.insert({
           userId: this.body.id,
           roleId,
@@ -122,12 +113,16 @@ export default class AdminUser extends youngService {
    * @returns
    */
   async update() {
-    const { roleIds } = this.body;
+    const { roleIds = [] } = this.body;
     delete this.body.roleIds;
-    this.body.password = this.app.comm.helper.encrypt(
-      this.body.password,
-      this.app.config.passwordStr || "young"
-    );
+    if (this.body.password) {
+      this.body.password = this.app.comm.helper.encrypt(
+        this.body.password,
+        this.app.config.passwordStr || "young"
+      );
+    } else {
+      delete this.body.password;
+    }
     await this.app.orm.AdminUserEntity.update({ id: this.body.id }, this.body);
     //操作角色
     if (roleIds) {
@@ -136,7 +131,7 @@ export default class AdminUser extends youngService {
         userId: this.body.id,
       });
       //新的插入
-      roleIds.split(",").forEach((roleId) => {
+      roleIds.forEach((roleId) => {
         let repeat = false;
         old.forEach((o) => {
           if (o.roleId == roleId) {
@@ -162,8 +157,6 @@ export default class AdminUser extends youngService {
       if (deleteArray.length)
         this.app.orm.AdminUserRoleEntity.delete({ id: In(deleteArray) });
     }
-    //删除redis缓存
-    this.app.redis.del(`adminMenu:${this.body.id}`);
     return this.success();
   }
   /**
@@ -176,5 +169,27 @@ export default class AdminUser extends youngService {
       userId: In(this.body.ids.toString().split(",")),
     });
     return this.success();
+  }
+
+  /**
+   * 当前用户详情
+   * @returns
+   */
+  @ApiDoc("用户信息", {}, { data: "用户信息" })
+  @get("/userInfo")
+  async userInfo() {
+    const userId = this.ctx.adminUser.id;
+    const user: any = await this.app.orm.AdminUserEntity.findOne({
+      id: userId,
+    });
+    if (!user) throw new Error("用户不存在");
+    delete user.password;
+    user.roleIds = (
+      await this.app.orm.AdminUserRoleEntity.find({ userId })
+    ).map((r) => {
+      return r.roleId;
+    });
+    await this.getUserMenu(user);
+    return this.success(user);
   }
 }
