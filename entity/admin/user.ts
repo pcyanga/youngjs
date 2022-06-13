@@ -10,4 +10,7 @@ export default class AdminUserEntity extends Base {
 
   @Column({ comment: "密码", length: 50 })
   password: String;
+
+  @Column({ comment: "状态", default: true })
+  status: Boolean
 }

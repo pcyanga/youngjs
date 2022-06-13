@@ -1,12 +1,13 @@
 import { get, router, youngService } from "@youngjs/core";
 import { In } from "typeorm";
 import { ApiCategory } from "@youngjs/swagger-doc";
+import AdminRoleEntity from "../../entity/admin/role";
 @router("/admin/role", ["info", "page", "list", "add", "update", "delete"])
 @ApiCategory("角色管理")
 export default class AdminRole extends youngService {
   constructor(ctx) {
     super(ctx);
-    this.entity = "AdminRole";
+    this.entity = AdminRoleEntity;
     this.searchOption.keywords = ["rolename"];
   }
   /**
