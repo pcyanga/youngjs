@@ -4,6 +4,7 @@ import moment = require("moment");
 //日志文件自动保存为每天1份
 export default class AdminLog extends youngService {
   async logDay() {
+    if (this.app.env != "prod") return;
     const fileDir = this.app.rootDir + "../logs/";
     const oldErrLog = fileDir + "err.log";
     const newErrLog = fileDir + `err-${moment().format("YYYY-MM-DD")}.log`;
