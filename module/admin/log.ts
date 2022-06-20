@@ -5,11 +5,12 @@ import moment = require("moment");
 export default class AdminLog extends youngService {
   async logDay() {
     if (this.app.env != "prod") return;
+    const yesterday = moment().add(-1, "day").format("YYYY-MM-DD");
     const fileDir = this.app.rootDir + "../logs/";
     const oldErrLog = fileDir + "err.log";
-    const newErrLog = fileDir + `err-${moment().format("YYYY-MM-DD")}.log`;
+    const newErrLog = fileDir + `err-${yesterday}.log`;
     const oldLogLog = fileDir + "out.log";
-    const newLogLog = fileDir + `out-${moment().format("YYYY-MM-DD")}.log`;
+    const newLogLog = fileDir + `out-${yesterday}.log`;
     if (fs.existsSync(oldErrLog)) {
       //复制文件
       fs.copyFileSync(oldErrLog, newErrLog);
