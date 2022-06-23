@@ -13,7 +13,7 @@ export default class Task extends youngService {
   async init() {
     //做一个判断
     if (!this.app.config.typeorm) {
-      this.app.log.warn("config typeorm undefined,task Uninitialized!");
+      this.app.log.warn("config typeorm undefined,task uninitialized!");
       return;
     }
     const tasks: any = await this.app.orm.AdminTaskEntity.find({ status: 1 });
