@@ -2,7 +2,7 @@ import * as path from "path";
 module.exports = {
   typeorm: {
     type: "mysql",
-    host: "47.106.113.98",
+    host: "127.0.0.1",
     port: 3306,
     username: "young",
     password: "FwKHrkejdxyrCrn6",
