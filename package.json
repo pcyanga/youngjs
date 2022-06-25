@@ -7,12 +7,12 @@
   "scripts": {
     "start": "tsc && pm2 start pm2.json",
     "stop": "pm2 stop youngjs",
-    "restart": "tsc && pm2 restart youngjs",
-    "reload": "pm2 reload youngjs",
+    "restart": "tsc && pm2 delete youngjs && pm2 start pm2.json",
+    "reload": "tsc && pm2 reload youngjs",
     "dev": "nodemon app.ts"
   },
   "dependencies": {
-    "@youngjs/core": "^1.0.14",
+    "@youngjs/core": "^1.0.18",
     "@youngjs/swagger-doc": "^1.0.3",
     "jsonwebtoken": "^8.5.1",
     "svg-captcha": "^1.4.0",
