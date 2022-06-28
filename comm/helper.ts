@@ -159,7 +159,8 @@ export default class helper {
     let ip = "";
     try {
       ip = await this.getReqIP(ctx);
-      const bst = new ipdb.BaseStation(__dirname + `/ipipfree.ipdb`);
+      console.log(ctx.app.rootDir);
+      const bst = new ipdb.BaseStation(ctx.app.rootDir + `comm/ipipfree.ipdb`);
       const result = bst.findInfo(ip, "CN");
       if (result) {
         result.addr = `${result.countryName},${result.regionName},${result.cityName}`;
@@ -168,6 +169,7 @@ export default class helper {
         return result;
       }
     } catch (err) {
+      console.log(err);
       return { ip, addr: "", country: "" };
     }
   }
