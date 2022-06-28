@@ -115,6 +115,7 @@ export default class AdminUser extends youngService {
    */
   async update() {
     const { roleIds = [] } = this.body;
+    if (!this.body.id) this.body.id = this.ctx.adminUser.id;
     delete this.body.roleIds;
     if (this.body.password) {
       this.body.password = this.app.comm.helper.encrypt(
@@ -126,7 +127,7 @@ export default class AdminUser extends youngService {
     }
     await this.app.orm.AdminUserEntity.update({ id: this.body.id }, this.body);
     //操作角色
-    if (roleIds) {
+    if (roleIds.length > 0) {
       //先查出所有旧的
       const old: any = await this.app.orm.AdminUserRoleEntity.find({
         userId: this.body.id,
