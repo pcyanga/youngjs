@@ -1,3 +1,5 @@
+import * as ipdb from "ipip-ipdb";
+
 export default class helper {
   /**
    * 休眠
@@ -147,5 +149,37 @@ export default class helper {
       charPreset: "0123456789",
     });
     return res;
+  }
+
+  /**
+   * 根据IP获得请求地址
+   * @param ip 为空时则为当前请求的IP地址
+   */
+  async getIpAddr(ctx) {
+    let ip = "";
+    try {
+      ip = await this.getReqIP(ctx);
+      const bst = new ipdb.BaseStation(__dirname + `/ipipfree.ipdb`);
+      const result = bst.findInfo(ip, "CN");
+      if (result) {
+        result.addr = `${result.countryName},${result.regionName},${result.cityName}`;
+        result.ip = ip;
+        result.country = result.countryName;
+        return result;
+      }
+    } catch (err) {
+      return { ip, addr: "", country: "" };
+    }
+  }
+
+  /**
+   * 获得请求IP
+   */
+  async getReqIP(ctx) {
+    const req = ctx.req;
+    const ip =
+      req.headers["x-forwarded-for"] ||
+      req.socket.remoteAddress.replace("::ffff:", "");
+    return ip.split(",")[ip.split(",").length - 1];
   }
 }

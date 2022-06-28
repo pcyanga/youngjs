@@ -12,5 +12,11 @@ export default class AdminUserEntity extends Base {
   password: String;
 
   @Column({ comment: "状态", default: true })
-  status: Boolean
+  status: Boolean;
+
+  @Column({ comment: "ip", length: 100, default: "" })
+  ip: String;
+
+  @Column({ comment: "ip所在地", length: 100, default: "" })
+  ipAddr: String;
 }
