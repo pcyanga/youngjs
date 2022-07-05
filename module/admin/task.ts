@@ -38,7 +38,7 @@ export default class Task extends youngService {
     if (task.startDate) params.startDate = task.startDate;
     if (task.endDate) params.endDate = task.endDate;
     if (task.type == 1) {
-      params.every = task.every;
+      params.every = Number(task.every);
     } else {
       params.cron = task.cron;
     }
@@ -87,12 +87,14 @@ export default class Task extends youngService {
   async add() {
     await this.app.orm.AdminTaskEntity.save(this.body);
     const config = this.getRepeatConfig(this.body);
-    await this.app.task.add(this.body, {
-      jobId: this.body.id,
-      repeat: config,
-      removeOnComplete: true,
-      removeOnFail: true,
-    });
+    if (this.body.status) {
+      await this.app.task.add(this.body, {
+        jobId: this.body.id,
+        repeat: config,
+        removeOnComplete: true,
+        removeOnFail: true,
+      });
+    }
     return this.success();
   }
 
@@ -105,13 +107,15 @@ export default class Task extends youngService {
         this.app.task.removeRepeatableByKey(j.key);
       }
     });
-    const config = this.getRepeatConfig(this.body);
-    await this.app.task.add(this.body, {
-      jobId: this.body.id,
-      repeat: config,
-      removeOnComplete: true,
-      removeOnFail: true,
-    });
+    if (this.body.status) {
+      const config = this.getRepeatConfig(this.body);
+      await this.app.task.add(this.body, {
+        jobId: this.body.id,
+        repeat: config,
+        removeOnComplete: true,
+        removeOnFail: true,
+      });
+    }
     return this.success();
   }
 
@@ -129,5 +133,6 @@ export default class Task extends youngService {
         });
     });
     await super.delete();
+    return this.success();
   }
 }
