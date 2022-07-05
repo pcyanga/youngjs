@@ -19,7 +19,7 @@ export default class AdminUser extends youngService {
   @post("/login")
   @ApiDoc(
     "登录",
-    { username: "用户名", password: "密码", },
+    { username: "用户名", password: "密码" },
     {
       data: {
         token: "token",
@@ -44,6 +44,7 @@ export default class AdminUser extends youngService {
       id: user.id,
       nickname: user.nickname,
     });
+    this.saveIp(user.id);
     return this.success(token);
   }
   /**
@@ -114,6 +115,7 @@ export default class AdminUser extends youngService {
    */
   async update() {
     const { roleIds = [] } = this.body;
+    if (!this.body.id) this.body.id = this.ctx.adminUser.id;
     delete this.body.roleIds;
     if (this.body.password) {
       this.body.password = this.app.comm.helper.encrypt(
@@ -125,7 +127,7 @@ export default class AdminUser extends youngService {
     }
     await this.app.orm.AdminUserEntity.update({ id: this.body.id }, this.body);
     //操作角色
-    if (roleIds) {
+    if (roleIds.length > 0) {
       //先查出所有旧的
       const old: any = await this.app.orm.AdminUserRoleEntity.find({
         userId: this.body.id,
@@ -191,5 +193,15 @@ export default class AdminUser extends youngService {
     });
     await this.getUserMenu(user);
     return this.success(user);
+  }
+
+  async saveIp(userId) {
+    const ipAddr = await this.app.comm.helper.getIpAddr(this.ctx);
+    if (ipAddr.ip) {
+      this.app.orm.AdminUserEntity.update(
+        { id: userId },
+        { ip: ipAddr.ip, ipAddr: ipAddr.addr }
+      );
+    }
   }
 }
