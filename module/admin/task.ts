@@ -34,7 +34,7 @@ export default class Task extends youngService {
   }
   getRepeatConfig(task) {
     let params: any = { name: `young-${task.id}` };
-    if (task.limit) params.limit = task.limit;
+    if (task.limit) params.limit = Number(task.limit);
     if (task.startDate) params.startDate = task.startDate;
     if (task.endDate) params.endDate = task.endDate;
     if (task.type == 1) {
