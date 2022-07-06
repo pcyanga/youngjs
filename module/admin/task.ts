@@ -1,4 +1,4 @@
-import { router, youngService } from "@youngjs/core";
+import { get, router, youngService } from "@youngjs/core";
 import * as moment from "moment";
 import { ApiCategory } from "@youngjs/swagger-doc";
 import AdminTaskEntity from "../../entity/admin/task";
@@ -62,25 +62,31 @@ export default class Task extends youngService {
   }
   //异步执行
   async executeForAsync(job) {
+    let result;
+    let status;
     try {
       if (job.data.service) {
         const tmp = job.data.service.split(".");
         const method = tmp[1].split("(")[0];
         const paramString = tmp[1].split("(")[1].split(")")[0];
         const params = paramString ? JSON.parse(paramString) : "";
-        const result = await this.app.service[tmp[0]][method](params);
-        this.app.orm.AdminTaskLogEntity.save({
-          taskId: job.data.id,
-          result: result
-            ? typeof result == "object"
-              ? JSON.stringify(result)
-              : result
-            : "",
-        });
+        result = await this.app.service[tmp[0]][method](params);
+        status = 1;
       }
     } catch (err) {
+      result = err.stack;
+      status = 0;
       this.app.log.error("task running error:" + err.stack);
     }
+    this.app.orm.AdminTaskLogEntity.save({
+      taskId: job.data.id,
+      status,
+      result: result
+        ? typeof result == "object"
+          ? JSON.stringify(result)
+          : result
+        : "",
+    });
   }
 
   //添加
@@ -133,6 +139,20 @@ export default class Task extends youngService {
         });
     });
     await super.delete();
+    return this.success();
+  }
+
+  //立即执行
+  @get("/doNow")
+  async doNow() {
+    const info = await this.app.orm.AdminTaskEntity.findOne({
+      id: this.query.id,
+    });
+    if (!info) throw new Error("任务不存在");
+    await this.app.task.add(info, {
+      removeOnComplete: true,
+      removeOnFail: true,
+    });
     return this.success();
   }
 }

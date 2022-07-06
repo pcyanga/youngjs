@@ -7,4 +7,7 @@ export default class AdminTaskLogEntity extends Base {
 
   @Column({ comment: "执行结果", type: "longtext" })
   result: String;
+
+  @Column({ comment: "状态", default: 1 })
+  status: number;
 }

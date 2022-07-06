@@ -7,5 +7,6 @@ export default class AdminTaskLog extends youngService {
   constructor(ctx) {
     super(ctx);
     this.entity = AdminTaskLogEntity;
+    this.searchOption.fieldEq = ["taskId"];
   }
 }
