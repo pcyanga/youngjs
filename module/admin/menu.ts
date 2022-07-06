@@ -1,4 +1,4 @@
-import { router, youngService } from "@youngjs/core";
+import { get, router, youngService } from "@youngjs/core";
 import { ApiCategory } from "@youngjs/swagger-doc";
 import AdminMenuEntity from "../../entity/admin/menu";
 @router("/admin/menu", ["info", "list", "add", "update", "delete"])
@@ -55,5 +55,59 @@ export default class AdminMenu extends youngService {
       });
     }
     return menuRoot;
+  }
+
+  //获取所有路由
+  @get("/getRouters")
+  async getRouters() {
+    const routers = this.app['router']
+    const list = []
+    for (const r of routers) {
+      if (r.path.startsWith("/admin")) {
+        const path = r.path.replace("/admin/", "")
+        if (path == "") continue
+        const pathList = path.split("/")
+        console.log(path, pathList)
+        let find = false
+        for (const l of list) {
+          if (l.value == pathList[0]) {
+            find = true
+            if (pathList.length == 2) {
+              l.children.push({
+                value: pathList[1] + ":" + r.method,
+                label: pathList[1],
+              })
+            } else {
+              let findc = false
+              for (const lc of l.children) {
+                if (lc.value == pathList[1]) {
+                  if (pathList.length == 3) {
+                    findc = true
+                    l.children.push({
+                      value: pathList[2] + ":" + r.method,
+                      label: pathList[2],
+                    })
+                  }
+                }
+              }
+              if (findc == false) {
+                l.children.push({
+                  value: pathList[1],
+                  label: pathList[1],
+                })
+              }
+            }
+          }
+        }
+        if (find == false) {
+          list.push({
+            value: pathList[0],
+            label: pathList[0],
+            children: []
+          })
+        }
+      }
+    }
+    return this.success(list)
   }
 }

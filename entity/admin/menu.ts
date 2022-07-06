@@ -19,4 +19,7 @@ export default class AdminMenuEntity extends Base {
 
   @Column({ comment: "图标", length: 100, default: "" })
   icon: string;
+
+  @Column({ comment: "权限组", type: "longtext", nullable: true })
+  actions: string;
 }
