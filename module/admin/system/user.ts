@@ -2,12 +2,12 @@ import { router, post, youngService, get } from "@youngjs/core";
 import { In } from "typeorm";
 import * as _ from "lodash";
 import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
-import AdminUserEntity from "../../entity/admin/user";
+import AdminUserEntity from "../../../entity/admin/user";
 
 /**
  * 后台用户
  */
-@router("/admin/user", ["info", "add", "update", "delete", "page"])
+@router("/admin/system/user", ["info", "add", "update", "delete", "page"])
 @ApiCategory("用户管理")
 export default class AdminUser extends youngService {
   constructor(ctx) {
@@ -72,6 +72,12 @@ export default class AdminUser extends youngService {
    * @returns
    */
   async getUserMenu(user) {
+    const key = `adminMenu:${user.id}`;
+    const exist = await this.app.redis.get(key);
+    if (exist) {
+      user.menu = JSON.parse(exist);
+      return;
+    }
     const menu = await this.sql(
       `select a.id,a.name,a.pid,a.type,a.key,a.icon from admin_menu a
       left join admin_role_menu b on a.id = b.menuId 
@@ -81,8 +87,55 @@ export default class AdminUser extends youngService {
       [user.roleIds]
     );
     user.menu = this.app.service.AdminMenu.arrange(_.cloneDeep(menu));
-    this.app.redis.set(`adminMenu:${user.id}`, JSON.stringify(menu));
+    this.app.redis.set(key, JSON.stringify(user.menu));
     return user;
+  }
+
+  /**
+   * 获取用户所有能访问的路径权限
+   * @param user
+   */
+  async getUserRouters(user) {
+    const key = `adminRouter:${user.id}`;
+    const exist = await this.app.redis.get(key);
+    if (exist) {
+      user.aciotnsList = JSON.parse(exist);
+      return;
+    }
+    const aciotns = await this.sql(
+      `select actions from admin_menu a
+      left join admin_role_menu b on a.id = b.menuId 
+      where b.roleId in (?)`,
+      [user.roleIds]
+    );
+    const aciotnsList = [];
+    aciotns.forEach((a) => {
+      if (a.actions) {
+        const l = a.actions.split(";");
+        aciotnsList.push(...l);
+      }
+    });
+    this.app.redis.set(key, JSON.stringify(aciotnsList));
+    user.aciotnsList = aciotnsList;
+  }
+
+  async getUserRoutersById(userId) {
+    const key = `adminRouter:${userId}`;
+    const exist = await this.app.redis.get(key);
+    if (exist) {
+      return JSON.parse(exist);
+    }
+    const user: any = await this.app.orm.AdminUserEntity.findOne({
+      id: userId,
+    });
+    if (!user) throw new Error("用户不存在");
+    user.roleIds = (
+      await this.app.orm.AdminUserRoleEntity.find({ userId })
+    ).map((r) => {
+      return r.roleId;
+    });
+    await this.getUserRouters(user);
+    return user.aciotnsList;
   }
   /**
    * 添加用户
@@ -192,6 +245,7 @@ export default class AdminUser extends youngService {
       return r.roleId;
     });
     await this.getUserMenu(user);
+    await this.getUserRouters(user);
     return this.success(user);
   }
 

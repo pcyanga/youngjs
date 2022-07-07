@@ -7,7 +7,7 @@ module.exports = async (ctx: any, next: () => void) => {
   const config = {
     secret: "young963456", //token加密串
     expires: 3600 * 24 * 7, //token有效时长
-    ignoreUrl: ["admin/user/login"], //忽略检测的路由数组
+    ignoreUrl: ["admin/system/user/login"], //忽略检测的路由数组
     checkUrlPrefix: ["admin"], //需要检测的路由前缀
     checkRepeatUrl: ["api/test", "api-doc"],
   };
@@ -41,7 +41,6 @@ module.exports = async (ctx: any, next: () => void) => {
       //防止重复请求
       if (config.checkRepeatUrl.indexOf(url) >= 0) {
         const token = ctx.request.headers.token || "";
-        console.log(token);
         if ((await checkUuidToken(token)) == null) {
           ctx.body = "token valid";
           ctx.status = 403;
@@ -61,15 +60,22 @@ module.exports = async (ctx: any, next: () => void) => {
         try {
           ctx[prefix + "User"] = jwt.verify(authorization, secret);
           //判断权限
-          // let rights = await ctx.app.redis.get(`adminMenu:${ctx.adminUser.id}`);
-          // rights = JSON.parse(rights)
-          // if (_.find(rights, { key: url }) === undefined) {
-          //   ctx.body = {
-          //     code: 403,
-          //     message: "没有权限",
-          //   };
-          //   return;
-          // }
+          let rights = await ctx.app.service.AdminUser.getUserRoutersById(
+            ctx.adminUser.id
+          );
+          const action =
+            url.replace("admin/", "") + ":" + ctx.method.toLowerCase();
+          const find = rights.filter((r) => {
+            return r == action;
+          });
+          if (find.length == 0) {
+            ctx.status = 401;
+            ctx.body = {
+              code: 401,
+              message: "没有权限",
+            };
+            return;
+          }
         } catch (err) {
           ctx.status = 403;
           ctx.body = "Forbidden";

@@ -2,20 +2,15 @@ import { Base } from "@youngjs/core";
 import { Entity, Column } from "typeorm";
 @Entity({ name: "api_user" })
 export default class ApiUserEntity extends Base {
-  @Column({
-    length: 100,
-  })
-  name: String;
+  @Column({ comment: "用户名", length: 30 })
+  username: String;
 
-  @Column("text")
-  description: string;
+  @Column({ comment: "昵称", length: 30, default: "" })
+  nickname: String;
 
-  @Column()
-  filename: string;
+  @Column({ comment: "头像", length: 255, default: "" })
+  avatar: String;
 
-  @Column("double")
-  views: number;
-
-  @Column()
-  isPublished: number;
+  @Column({ comment: "状态", default: true })
+  status: Boolean;
 }

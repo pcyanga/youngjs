@@ -159,7 +159,6 @@ export default class helper {
     let ip = "";
     try {
       ip = await this.getReqIP(ctx);
-      console.log(ctx.app.rootDir);
       const bst = new ipdb.BaseStation(ctx.app.rootDir + `comm/ipipfree.ipdb`);
       const result = bst.findInfo(ip, "CN");
       if (result) {
