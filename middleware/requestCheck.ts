@@ -77,6 +77,7 @@ module.exports = async (ctx: any, next: () => void) => {
             return;
           }
         } catch (err) {
+          console.log(err);
           ctx.status = 403;
           ctx.body = "Forbidden";
           return;
