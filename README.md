@@ -7,27 +7,36 @@
 详细文档可查看【<a href="https://youngjs.top" target="_blank">Youngjs</a>】
 
 # 开发配置
+### 本地开发
 
-由于本框架是 ts 文件直接运行，所以需要安装全局模块 ts-node
 
 ```
+//由于本框架是 ts 文件直接运行，所以需要安装全局模块 ts-node
 npm i ts-node -g
-```
 
-## 本地开发
-
-使用 nodemon 进行实时重启，配置文件在 nodemon.js
-
-```
+//使用 nodemon 进行实时重启，配置文件在 nodemon.js
 npm i nodemon -g
+
+//启动
+npm run dev
 ```
 
-## 线上部署
+### 线上部署
 
 使用 pm2 进行后台启动，配置文件在 pm2.js
 
 ```
+//安装依赖
 npm i pm2 -g
+
+//编译并启动
+npm start
+
+//热更新(不停止服务)
+npm reload
+
+//重启服务
+npm restart
 ```
 
 # 框架
@@ -56,6 +65,7 @@ npm i pm2 -g
     |-- module                 //业务层代码
     |-- queue                  //队列类（可删）
     |-- socket                 //即时通讯类（可删）
+    |-- dist                   //线上环境编译代码
 ```
 
 ## 路由及装饰器
