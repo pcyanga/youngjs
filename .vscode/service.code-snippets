@@ -3,13 +3,13 @@
     "prefix": "service",
     "body": [
       "import { router, youngService } from \"@youngjs/core\";",
-      "import ApiTestEntity from \"../../entity/test\";",
+      "import ApiTestEntity from \"../../../entity/test\";",
       "//测试",
       "@router(\"/test\", [\"info\", \"page\", \"list\", \"add\", \"update\", \"delete\"])",
       "export default class Test extends youngService {",
       "  constructor(ctx) {",
       "    super(ctx);",
-      "    this.entity = TestEntity;",
+      "    this.entity = ApiTestEntity;",
       "  }",
       "}"
     ],

@@ -5,3 +5,4 @@ logs/
 typings
 swagger.json
 dist/
+public/upload

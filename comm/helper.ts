@@ -159,7 +159,11 @@ export default class helper {
     let ip = "";
     try {
       ip = await this.getReqIP(ctx);
-      const bst = new ipdb.BaseStation(ctx.app.rootDir + `comm/ipipfree.ipdb`);
+      const bst = new ipdb.BaseStation(
+        ctx.app.rootDir +
+          (ctx.app.env == "prod" ? "/../" : "") +
+          `comm/ipipfree.ipdb`
+      );
       const result = bst.findInfo(ip, "CN");
       if (result) {
         result.addr = `${result.countryName},${result.regionName},${result.cityName}`;
