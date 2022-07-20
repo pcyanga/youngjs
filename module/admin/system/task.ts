@@ -2,6 +2,7 @@ import { get, router, youngService } from "@youngjs/core";
 import * as moment from "moment";
 import { ApiCategory } from "@youngjs/swagger-doc";
 import AdminTaskEntity from "../../../entity/admin/task";
+import * as _ from "lodash";
 @ApiCategory("任务管理")
 @router("/admin/system/task", [
   "info",
@@ -26,10 +27,13 @@ export default class Task extends youngService {
     }
     const tasks: any = await this.app.orm.AdminTaskEntity.find({ status: 1 });
     const old = await this.app.task.getRepeatableJobs();
-    old.forEach(async (o) => {
-      await this.app.task.removeRepeatableByKey(o.key);
-    });
-    tasks.forEach(async (t) => {
+    for (const t of tasks) {
+      //已存在的不处理
+      const find = _.find(old, { id: t.id });
+      if (find) {
+        this.app.log.info(`task [${t.name}] exits!`, true);
+        continue;
+      }
       const config = this.getRepeatConfig(t);
       await this.app.task.add(t, {
         jobId: t.id,
@@ -38,7 +42,7 @@ export default class Task extends youngService {
         removeOnFail: true,
       });
       this.app.log.info(`task [${t.name}] init successfully!`, true);
-    });
+    }
   }
   getRepeatConfig(task) {
     let params: any = { name: `young-${task.id}` };
