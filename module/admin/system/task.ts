@@ -60,15 +60,7 @@ export default class Task extends youngService {
   async execute(job, done) {
     this.executeForAsync(job);
     if (this.app.config.typeorm) {
-      const jobs = await this.app.task.getRepeatableJobs();
-      jobs.forEach((j) => {
-        if (j.id == job.data.id) {
-          this.app.orm.AdminTaskEntity.update(
-            { id: job.data.id },
-            { nextRunTime: moment(j.next).format("YYYY-MM-DD HH:mm:ss") }
-          );
-        }
-      });
+      this.updateNextTime(job.data.id);
     }
     done();
   }
@@ -113,6 +105,7 @@ export default class Task extends youngService {
         removeOnFail: true,
       });
     }
+    this.updateNextTime(this.body.id);
     return this.success();
   }
 
@@ -133,6 +126,7 @@ export default class Task extends youngService {
         removeOnComplete: true,
         removeOnFail: true,
       });
+      this.updateNextTime(this.body.id);
     }
     return this.success();
   }
@@ -166,5 +160,18 @@ export default class Task extends youngService {
       removeOnFail: true,
     });
     return this.success();
+  }
+
+  //更新下次执行时间
+  async updateNextTime(id) {
+    const jobs = await this.app.task.getRepeatableJobs();
+    jobs.forEach((j) => {
+      if (j.id == id) {
+        this.app.orm.AdminTaskEntity.update(
+          { id },
+          { nextRunTime: moment(j.next).format("YYYY-MM-DD HH:mm:ss") }
+        );
+      }
+    });
   }
 }
