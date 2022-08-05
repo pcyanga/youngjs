@@ -16,6 +16,11 @@ export default class Demo extends youngService {
     left join admin_menu b on a.menuId = b.id  where 1 = 1 `;
     //模糊匹配，从参数获取，也可以自己传 params
     this.sqlJoin("keywords", "name like ? or actions like ? or `key` = ?");
+    // this.sqlJoin("keywords", "name like ? or actions like ? or `key` = ?", [
+    //   `%${this.body.keywords}%`,
+    //   `%${this.body.keywords}%`,
+    //   `%${this.body.keywords}%`,
+    // ]);
     //全等
     // this.sqlJoin("roleId", "=");
     //大小，从post参数获取id
@@ -31,5 +36,17 @@ export default class Demo extends youngService {
   @get("test/:id")
   async test() {
     return this.success(this.query);
+  }
+
+  //队列插入及消费
+  @get("queue")
+  async queue() {
+    this.app.queue.test.add({ time: new Date().getTime() });
+  }
+
+  async consumeQueue(data) {
+    console.log("消费队列", data);
+    await this.app.comm.helper.sleep(100);
+    return;
   }
 }
