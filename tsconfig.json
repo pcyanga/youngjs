@@ -10,7 +10,7 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "stripInternal": true,
-    "declaration": true,
+    "declaration": false,
     "outDir": "./dist",
     "pretty": true,
     "skipLibCheck": true,
