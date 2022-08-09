@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@youngjs/core": "^1.0.31",
-    "@youngjs/swagger-doc": "^1.0.5",
+    "@youngjs/swagger-doc": "^1.0.6",
     "ali-oss": "^6.17.1",
     "ipip-ipdb": "^0.6.0",
     "jsonwebtoken": "^8.5.1",
