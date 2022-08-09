@@ -2,16 +2,19 @@ import { post, router, youngService } from "@youngjs/core";
 import moment = require("moment");
 import path = require("path");
 import * as fs from "fs";
-import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
 import * as OSS from "ali-oss";
 import { randomUUID } from "crypto";
-
-//测试
+/**
+ * 文件上传
+ */
 @router("/admin/file", [])
 @router("/api/file", [])
-@ApiCategory("文件")
 export default class File extends youngService {
-  @ApiDoc("上传", { file: { type: "file", name: "文件" } })
+  /**
+   * 上传
+   * @param file file 文件 required
+   * @returns
+   */
   @post("/upload")
   async upload() {
     const files = this.ctx.request.files.file;

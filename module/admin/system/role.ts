@@ -1,7 +1,9 @@
 import { get, router, youngService } from "@youngjs/core";
 import { In } from "typeorm";
-import { ApiCategory } from "@youngjs/swagger-doc";
 import AdminRoleEntity from "../../../entity/admin/role";
+/**
+ * 角色管理
+ */
 @router("/admin/system/role", [
   "info",
   "page",
@@ -10,7 +12,6 @@ import AdminRoleEntity from "../../../entity/admin/role";
   "update",
   "delete",
 ])
-@ApiCategory("角色管理")
 export default class AdminRole extends youngService {
   constructor(ctx) {
     super(ctx);
@@ -92,6 +93,10 @@ export default class AdminRole extends youngService {
     return this.success();
   }
 
+  /**
+   * 获取角色菜单
+   * @returns
+   */
   @get("/getRoleMenu")
   async getRoleMenu() {
     const { roleId } = this.query;

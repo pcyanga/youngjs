@@ -1,7 +1,8 @@
 import { get, router, youngService } from "@youngjs/core";
-import { ApiCategory } from "@youngjs/swagger-doc";
 import ApiTestEntity from "../../entity/test";
-@ApiCategory("示例")
+/**
+ * 示例
+ */
 @router("/demo", ["info", "page", "add", "delete", "update", "list"])
 export default class Demo extends youngService {
   constructor(ctx) {
@@ -21,8 +22,9 @@ export default class Demo extends youngService {
     //   `%${this.body.keywords}%`,
     //   `%${this.body.keywords}%`,
     // ]);
-    //全等
+    //全等，两个用法效果等同
     // this.sqlJoin("roleId", "=");
+    // this.sqlJoin("roleId", "roleId = ?", 2);
     //大小，从post参数获取id
     // this.sqlJoin("b.id", ">=");
     //拼装聚合或者其他语句

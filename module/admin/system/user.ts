@@ -1,14 +1,11 @@
 import { router, post, youngService, get } from "@youngjs/core";
 import { In } from "typeorm";
 import * as _ from "lodash";
-import { ApiCategory, ApiDoc } from "@youngjs/swagger-doc";
 import AdminUserEntity from "../../../entity/admin/user";
-
 /**
  * 后台用户
  */
 @router("/admin/system/user", ["info", "add", "update", "delete", "page"])
-@ApiCategory("用户管理")
 export default class AdminUser extends youngService {
   constructor(ctx) {
     super(ctx);
@@ -16,17 +13,14 @@ export default class AdminUser extends youngService {
     this.searchOption.keywords = ["username", "nickname"];
     this.searchOption.fieldEq = ["id"];
   }
+
+  /**
+   * 登录
+   * @param username string 用户名 require
+   * @param password string 密码 require
+   * @returns
+   */
   @post("/login")
-  @ApiDoc(
-    "登录",
-    { username: "用户名", password: "密码" },
-    {
-      data: {
-        token: "token",
-        exprireIn: "有效时长",
-      },
-    }
-  )
   async login() {
     const user = await this.app.orm.AdminUserEntity.findOne({
       username: this.body.username,
@@ -49,9 +43,8 @@ export default class AdminUser extends youngService {
   }
   /**
    * 用户详情
-   * @returns
+   * @returns data 用户信息
    */
-  @ApiDoc("用户信息", {}, { data: "用户信息" })
   async info() {
     const userId = this.query.id;
     const user: any = await this.app.orm.AdminUserEntity.findOne({
@@ -139,6 +132,7 @@ export default class AdminUser extends youngService {
   }
   /**
    * 添加用户
+   * @param user object 用户信息
    * @returns
    */
   async add() {
@@ -230,7 +224,6 @@ export default class AdminUser extends youngService {
    * 当前用户详情
    * @returns
    */
-  @ApiDoc("用户信息", {}, { data: "用户信息" })
   @get("/userInfo")
   async userInfo() {
     const userId = this.ctx.adminUser.id;

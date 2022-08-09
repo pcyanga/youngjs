@@ -1,9 +1,10 @@
 import { get, router, youngService } from "@youngjs/core";
 import * as moment from "moment";
-import { ApiCategory } from "@youngjs/swagger-doc";
 import AdminTaskEntity from "../../../entity/admin/task";
 import * as _ from "lodash";
-@ApiCategory("任务管理")
+/**
+ * 任务管理
+ */
 @router("/admin/system/task", [
   "info",
   "page",
