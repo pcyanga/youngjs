@@ -9,6 +9,7 @@
     "stop": "pm2 stop youngjs",
     "restart": "tsc && pm2 delete youngjs && pm2 start pm2.json",
     "reload": "tsc && pm2 reload youngjs",
+    "build": "tsc",
     "dev": "nodemon app.ts"
   },
   "dependencies": {
