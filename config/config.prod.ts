@@ -16,4 +16,10 @@ module.exports = {
     host: "127.0.0.1",
     port: 6379,
   },
+  doc: {
+    routePrefix: "api-doc",
+    title: "Youngjs接口文档",
+    version: "1.0.0",
+    host: "https://admin.youngjs.top/api",
+  },
 };
