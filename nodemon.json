@@ -2,5 +2,9 @@
   "watch": [],
   "ext": "ts js json",
   "exec": "ts-node ./app.ts",
-  "ignore": ["./typings", "./node_modules", "./dist"]
+  "ignore": [
+    "./typings/",
+    "./node_modules/",
+    "./dist/"
+  ]
 }
